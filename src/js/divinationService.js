@@ -1,4 +1,5 @@
 import { trigrams, hexagramNames, hexagramUnicode } from './divinationData.js';
+import { geminiClient } from './apiClient.js';
 
 class DivinationService {
     static trigrams = trigrams;

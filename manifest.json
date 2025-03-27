@@ -1,0 +1,35 @@
+{
+  "name": "梅花易數排盤",
+  "short_name": "梅花易數",
+  "description": "一款基於梅花易數的線上排盤工具，可協助您進行卜卦與解卦",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#FFF8DC",
+  "theme_color": "#8B4513",
+  "icons": [
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "orientation": "portrait",
+  "lang": "zh-Hant",
+  "categories": ["lifestyle", "utilities"],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "快速排卦",
+      "short_name": "排卦",
+      "description": "直接進入排卦頁面",
+      "url": "/index.html"
+    }
+  ]
+}
