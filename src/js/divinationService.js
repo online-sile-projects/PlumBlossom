@@ -8,29 +8,18 @@ class DivinationService {
     // 生成爻（包含變爻信息）
     generateLines() {
         const lines = [];
-        const changingLines = [];
+        const changingLines = Array(6).fill(false);
         
+        // 先生成六個爻
         for (let i = 0; i < 6; i++) {
-            const random = Math.random() * 100;
-            // 老陽(9)、老陰(6)為變爻
-            if (random < 25) {
-                // 老陽，本爻為陽，變爻為陰
-                lines.push(1);
-                changingLines.push(true);
-            } else if (random < 50) {
-                // 老陰，本爻為陰，變爻為陽
-                lines.push(0);
-                changingLines.push(true);
-            } else if (random < 75) {
-                // 少陽，本爻為陽，不變
-                lines.push(1);
-                changingLines.push(false);
-            } else {
-                // 少陰，本爻為陰，不變
-                lines.push(0);
-                changingLines.push(false);
-            }
+            const random = Math.random() * 2;
+            lines.push(random < 1 ? 0 : 1);  // 隨機生成陰爻(0)或陽爻(1)
         }
+
+        // 隨機選擇一個變爻位置（1-6）
+        const changingLinePosition = Math.floor(Math.random() * 6);
+        changingLines[changingLinePosition] = true;
+        
         return { lines, changingLines };
     }
 
