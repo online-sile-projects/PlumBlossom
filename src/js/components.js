@@ -9,7 +9,7 @@ class DivinationComponents {
         const lines = hexagram.lines;
         const hexagramHtml = `
             <div class="hexagram-container">
-                <h3>卦象</h3>
+                <h3 class="hexagram-name">${hexagram.hexagramName}</h3>
                 <div class="trigrams">
                     <div class="upper-trigram">
                         <h4>${hexagram.upperTrigram.name} ${hexagram.upperTrigram.symbol}</h4>
