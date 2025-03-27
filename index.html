@@ -5,6 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>梅花易數排盤</title>
     <link rel="stylesheet" href="src/css/style.css">
+    
+    <!-- PWA 相關設定 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8B4513">
+    <meta name="description" content="一款基於梅花易數的線上排盤工具，可協助您進行卜卦與解卦">
+    
+    <!-- iOS 支援 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="梅花易數">
+    <link rel="apple-touch-icon" href="icons/apple-icon-180x180.png">
+    
+    <!-- 網頁預載入 -->
+    <link rel="preload" href="src/js/app.js" as="script">
+    <link rel="preload" href="src/css/style.css" as="style">
 </head>
 <body>
     <div class="container">
@@ -32,7 +47,62 @@
         <div id="reading-result">
             <!-- 解卦結果將在這裡顯示 -->
         </div>
+        
+        <div class="pwa-install hidden" id="install-app">
+            <button id="install-button">安裝應用程式</button>
+        </div>
     </div>
     <script type="module" src="src/js/app.js"></script>
+    <script>
+        // 註冊 Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker 註冊成功，範圍：', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker 註冊失敗：', error);
+                    });
+            });
+        }
+        
+        // PWA 安裝提示處理
+        let deferredPrompt;
+        const installButton = document.getElementById('install-button');
+        const installContainer = document.getElementById('install-app');
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // 阻止 Chrome 顯示預設安裝提示
+            e.preventDefault();
+            // 儲存事件，以便稍後觸發
+            deferredPrompt = e;
+            // 顯示安裝按鈕
+            installContainer.classList.remove('hidden');
+        });
+        
+        installButton.addEventListener('click', () => {
+            // 顯示安裝提示
+            deferredPrompt.prompt();
+            
+            // 等待用戶回應
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('用戶已安裝應用');
+                    installContainer.classList.add('hidden');
+                } else {
+                    console.log('用戶拒絕安裝應用');
+                }
+                // 清除提示，只能使用一次
+                deferredPrompt = null;
+            });
+        });
+        
+        // 監聽應用已安裝事件
+        window.addEventListener('appinstalled', (evt) => {
+            installContainer.classList.add('hidden');
+            console.log('應用已安裝');
+        });
+    </script>
 </body>
 </html>
