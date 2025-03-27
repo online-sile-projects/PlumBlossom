@@ -4,12 +4,36 @@ class DivinationComponents {
         this.readingResult = document.getElementById('reading-result');
     }
 
-    // 繪製卦象
-    renderHexagram(hexagram) {
-        const lines = hexagram.lines;
-        const hexagramHtml = `
+    // 繪製卦象（包含本卦和變卦）
+    renderHexagram(hexagramData) {
+        const originalHexagram = this.renderSingleHexagram(hexagramData.original, '本卦');
+        const changedHexagram = hexagramData.changingLines.some(x => x)
+            ? this.renderSingleHexagram(hexagramData.changed, '變卦')
+            : '';
+        
+        const changingLinesInfo = hexagramData.changingLines.some(x => x)
+            ? `<div class="changing-lines">
+                變爻：${hexagramData.changingLines.map((isChanging, i) => 
+                    isChanging ? `<span class="changing-line">${i + 1}</span>` : ''
+                ).filter(x => x).join('、')}
+            </div>`
+            : '<div class="changing-lines">無變爻</div>';
+
+        this.hexagramDisplay.innerHTML = `
+            <div class="hexagrams-container">
+                ${originalHexagram}
+                ${changingLinesInfo}
+                ${changedHexagram}
+            </div>
+        `;
+    }
+
+    // 渲染單個卦象
+    renderSingleHexagram(hexagram, title) {
+        return `
             <div class="hexagram-container">
                 <div class="hexagram-header">
+                    <h3 class="hexagram-title">${title}</h3>
                     <span class="hexagram-symbol">${hexagram.hexagramSymbol}</span>
                     <h3 class="hexagram-name">${hexagram.hexagramName}</h3>
                 </div>
@@ -24,7 +48,7 @@ class DivinationComponents {
                     </div>
                 </div>
                 <div class="lines">
-                    ${lines.map((line, index) => `
+                    ${hexagram.lines.map((line, index) => `
                         <div class="line ${line ? 'yang' : 'yin'}">
                             ${line ? '━━━━━' : '━━ ━━'}
                         </div>
@@ -32,7 +56,6 @@ class DivinationComponents {
                 </div>
             </div>
         `;
-        this.hexagramDisplay.innerHTML = hexagramHtml;
     }
 
     // 顯示解卦結果

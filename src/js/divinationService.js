@@ -5,33 +5,73 @@ class DivinationService {
     static hexagramNames = hexagramNames;
     static hexagramUnicode = hexagramUnicode;
 
-    // 生成動爻
-    generateChangingLines() {
+    // 生成爻（包含變爻信息）
+    generateLines() {
         const lines = [];
+        const changingLines = [];
+        
         for (let i = 0; i < 6; i++) {
-            lines.push(Math.random() < 0.5 ? 0 : 1);
+            const random = Math.random() * 100;
+            // 老陽(9)、老陰(6)為變爻
+            if (random < 25) {
+                // 老陽，本爻為陽，變爻為陰
+                lines.push(1);
+                changingLines.push(true);
+            } else if (random < 50) {
+                // 老陰，本爻為陰，變爻為陽
+                lines.push(0);
+                changingLines.push(true);
+            } else if (random < 75) {
+                // 少陽，本爻為陽，不變
+                lines.push(1);
+                changingLines.push(false);
+            } else {
+                // 少陰，本爻為陰，不變
+                lines.push(0);
+                changingLines.push(false);
+            }
         }
-        return lines;
+        return { lines, changingLines };
     }
 
-    // 根據動爻生成卦象
+    // 根據爻生成卦象
     generateHexagram(question) {
-        const lines = this.generateChangingLines();
-        const upperTrigramIndex = parseInt(lines.slice(0, 3).join(''), 2);
-        const lowerTrigramIndex = parseInt(lines.slice(3, 6).join(''), 2);
+        const { lines, changingLines } = this.generateLines();
         
-        // 計算卦名
-        const hexagramCode = lines.join('');
-        const hexagramName = DivinationService.hexagramNames[hexagramCode] || '未知卦';
-        const hexagramSymbol = DivinationService.hexagramUnicode[hexagramCode] || '?';
+        // 計算本卦
+        const originalHexagram = this.calculateHexagram(lines);
+        
+        // 計算變卦
+        const changedLines = lines.map((line, index) => 
+            changingLines[index] ? (line === 1 ? 0 : 1) : line
+        );
+        const changedHexagram = this.calculateHexagram(changedLines);
         
         return {
-            lines,
+            original: {
+                ...originalHexagram,
+                lines
+            },
+            changed: {
+                ...changedHexagram,
+                lines: changedLines
+            },
+            changingLines,
+            question
+        };
+    }
+
+    // 計算單個卦象的資訊
+    calculateHexagram(lines) {
+        const upperTrigramIndex = parseInt(lines.slice(0, 3).join(''), 2);
+        const lowerTrigramIndex = parseInt(lines.slice(3, 6).join(''), 2);
+        const hexagramCode = lines.join('');
+        
+        return {
             upperTrigram: this.getTrigramByIndex(upperTrigramIndex),
             lowerTrigram: this.getTrigramByIndex(lowerTrigramIndex),
-            hexagramName,
-            hexagramSymbol,
-            question
+            hexagramName: DivinationService.hexagramNames[hexagramCode] || '未知卦',
+            hexagramSymbol: DivinationService.hexagramUnicode[hexagramCode] || '?'
         };
     }
 
@@ -43,13 +83,21 @@ class DivinationService {
 
     // 模擬解卦（實際應用中這裡會調用 Gemini API）
     async getReading(hexagram) {
-        // 模擬 API 調用
         return new Promise((resolve) => {
             setTimeout(() => {
+                const changingLinesText = hexagram.changingLines.some(x => x) 
+                    ? `\n變爻：${hexagram.changingLines.map((isChanging, i) => isChanging ? i + 1 : '').filter(x => x).join('、')}爻\n` 
+                    : '\n無變爻\n';
+                
                 resolve(`針對問題「${hexagram.question}」的解答：\n
-                上卦：${hexagram.upperTrigram.name}（${hexagram.upperTrigram.nature}）\n
-                下卦：${hexagram.lowerTrigram.name}（${hexagram.lowerTrigram.nature}）\n
-                卦名：${hexagram.hexagramName}\n
+                本卦：${hexagram.original.hexagramName}（${hexagram.original.hexagramSymbol}）
+                上卦：${hexagram.original.upperTrigram.name}（${hexagram.original.upperTrigram.nature}）
+                下卦：${hexagram.original.lowerTrigram.name}（${hexagram.original.lowerTrigram.nature}）
+                ${changingLinesText}
+                變卦：${hexagram.changed.hexagramName}（${hexagram.changed.hexagramSymbol}）
+                上卦：${hexagram.changed.upperTrigram.name}（${hexagram.changed.upperTrigram.nature}）
+                下卦：${hexagram.changed.lowerTrigram.name}（${hexagram.changed.lowerTrigram.nature}）
+                
                 這只是示例解釋，實際使用時將透過 Gemini API 獲取更詳細的解讀。`);
             }, 1000);
         });
