@@ -194,3 +194,85 @@ h1 {
     background-color: #fff3e0;
     border-radius: 20px;
 }
+
+/* API 設定區塊樣式 */
+.settings-panel {
+    margin-bottom: 25px;
+    padding: 15px;
+    border: 1px solid var(--primary-color);
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.settings-panel h3 {
+    color: var(--primary-color);
+    margin-top: 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.input-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.input-group label {
+    min-width: 150px;
+    font-weight: bold;
+}
+
+.input-group input {
+    flex-grow: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#save-api-key {
+    padding: 8px 12px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#save-api-key:hover {
+    opacity: 0.9;
+}
+
+.status-message {
+    margin: 10px 0;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.status-success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.status-error {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.toggle-button {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: 0.9em;
+    padding: 5px;
+    margin-left: auto;
+    display: block;
+    text-align: center;
+}
+
+.toggle-button:hover {
+    text-decoration: underline;
+}
