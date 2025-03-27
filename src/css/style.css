@@ -138,3 +138,24 @@ h1 {
     border-bottom: 2px solid var(--primary-color);
     padding-bottom: 10px;
 }
+
+.hexagram-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.hexagram-symbol {
+    font-size: 3em;
+    color: var(--primary-color);
+}
+
+.hexagram-name {
+    font-size: 1.8em;
+    color: var(--primary-color);
+    margin: 0;
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 10px;
+}
