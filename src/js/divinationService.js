@@ -1,4 +1,5 @@
 import { trigrams, hexagramNames, hexagramUnicode } from './divinationData.js';
+import { geminiClient } from './apiClient.js';
 
 class DivinationService {
     static trigrams = trigrams;
@@ -70,26 +71,17 @@ class DivinationService {
         return trigrams[index % 8];
     }
 
-    // 模擬解卦（實際應用中這裡會調用 Gemini API）
+    // 解卦（通過 Gemini API）
     async getReading(hexagram) {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                const changingLinesText = hexagram.changingLines.some(x => x) 
-                    ? `\n變爻：${hexagram.changingLines.map((isChanging, i) => isChanging ? i + 1 : '').filter(x => x).join('、')}爻\n` 
-                    : '\n無變爻\n';
-                
-                resolve(`針對問題「${hexagram.question}」的解答：\n
-                本卦：${hexagram.original.hexagramName}（${hexagram.original.hexagramSymbol}）
-                上卦：${hexagram.original.upperTrigram.name}（${hexagram.original.upperTrigram.nature}）
-                下卦：${hexagram.original.lowerTrigram.name}（${hexagram.original.lowerTrigram.nature}）
-                ${changingLinesText}
-                變卦：${hexagram.changed.hexagramName}（${hexagram.changed.hexagramSymbol}）
-                上卦：${hexagram.changed.upperTrigram.name}（${hexagram.changed.upperTrigram.nature}）
-                下卦：${hexagram.changed.lowerTrigram.name}（${hexagram.changed.lowerTrigram.nature}）
-                
-                這只是示例解釋，實際使用時將透過 Gemini API 獲取更詳細的解讀。`);
-            }, 1000);
-        });
+        try {
+            // 使用 Gemini API 獲取解卦結果
+            const reading = await geminiClient.getPlumBlossomDivination(hexagram);
+            return reading;
+        } catch (error) {
+            console.error("獲取卦象解讀時發生錯誤:", error);
+            // 使用後備方案，當 API 不可用時
+            return geminiClient.getFallbackReading(hexagram);
+        }
     }
 }
 
