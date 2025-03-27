@@ -1,3 +1,6 @@
+import { divinationService } from './divinationService.js';
+import { divinationComponents } from './components.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     const questionInput = document.getElementById('question-input');
     const submitButton = document.getElementById('submit-question');

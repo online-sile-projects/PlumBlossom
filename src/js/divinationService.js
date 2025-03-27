@@ -57,4 +57,4 @@ class DivinationService {
 }
 
 // 導出服務實例
-window.divinationService = new DivinationService();
+export const divinationService = new DivinationService();

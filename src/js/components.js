@@ -57,4 +57,4 @@ class DivinationComponents {
 }
 
 // 導出元件實例
-window.divinationComponents = new DivinationComponents();
+export const divinationComponents = new DivinationComponents();
