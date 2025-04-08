@@ -11,12 +11,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const apiStatusElement = document.getElementById('api-status');
     const toggleSettingsButton = document.getElementById('toggle-settings');
     const apiSettingsPanel = document.getElementById('api-settings');
+    const reinterpretButton = document.getElementById('reinterpret-question');
+    let currentQuestion = '';
     
     // 初始化時顯示歷史記錄
     historyManager.displayHistory();
     
     // 設定歷史記錄項目點擊處理器
     historyManager.setHistoryItemClickHandler(record => {
+        currentQuestion = record.hexagram.question; // 從 hexagram 物件中取得問題
+        questionInput.value = record.hexagram.question; // 同時更新輸入框
         divinationComponents.renderHexagram(record.hexagram);
         divinationComponents.displayReading(record.reading);
     });
@@ -118,13 +122,50 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // 註冊事件監聽器
-    submitButton.addEventListener('click', handleDivination);
+    submitButton.addEventListener('click', async function() {
+        currentQuestion = questionInput.value.trim();
+        if (currentQuestion) {
+            await performDivination(currentQuestion);
+        }
+    });
+    
+    reinterpretButton.addEventListener('click', async function() {
+        if (currentQuestion) {
+            await performDivination(currentQuestion);
+        } else {
+            alert('請先輸入問題並進行排卦');
+        }
+    });
+    
+    async function performDivination(question) {
+        if (!question) {
+            divinationComponents.showError('請輸入您的問題');
+            return;
+        }
+        
+        if (!geminiClient.apiKey) {
+            showApiKeyError('請先設定 Gemini API 金鑰');
+            return;
+        }
+        
+        try {
+            const hexagram = divinationService.generateHexagram(question);
+            divinationComponents.renderHexagram(hexagram);
+            divinationComponents.showLoading();
+            const reading = await divinationService.getReading(hexagram);
+            divinationComponents.displayReading(reading);
+            historyManager.addToHistory({ hexagram, reading });
+        } catch (error) {
+            console.error('排卦過程發生錯誤:', error);
+            divinationComponents.showError('排卦過程發生錯誤，請稍後再試');
+        }
+    }
     
     // 支援按下 Enter 鍵提交
     questionInput.addEventListener('keypress', (event) => {
         if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault();
-            handleDivination();
+            submitButton.click();
         }
     });
 });
