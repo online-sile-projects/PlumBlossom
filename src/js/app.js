@@ -30,6 +30,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // 初始化 API 金鑰設定
     initApiSettings();
     
+    // 按鈕控制函式
+    function disableButtons() {
+        submitButton.disabled = true;
+        reinterpretButton.disabled = true;
+    }
+
+    function enableButtons() {
+        submitButton.disabled = false;
+        reinterpretButton.disabled = false;
+    }
+    
     // 處理排卦請求
     async function handleDivination() {
         const question = questionInput.value.trim();
@@ -126,21 +137,29 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 註冊事件監聽器
     submitButton.addEventListener('click', async function() {
+        disableButtons();
         currentQuestion = questionInput.value.trim();
         if (currentQuestion) {
             currentHexagram = null; // 重置當前卦象，因為要重新排卦
-            await performDivination(currentQuestion);
+            try {
+                await performDivination(currentQuestion);
+            } finally {
+                enableButtons();
+            }
         }
     });
     
     reinterpretButton.addEventListener('click', async function() {
+        disableButtons();
         if (!currentQuestion) {
             alert('請先輸入問題並進行排卦');
+            enableButtons();
             return;
         }
 
         if (!geminiClient.apiKey) {
             showApiKeyError('請先設定 Gemini API 金鑰');
+            enableButtons();
             return;
         }
 
@@ -158,6 +177,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('解卦過程發生錯誤:', error);
             divinationComponents.showError('解卦過程發生錯誤，請稍後再試');
+        } finally {
+            enableButtons();
         }
     });
     

@@ -20,6 +20,12 @@
     <!-- 網頁預載入 -->
     <link rel="preload" href="src/js/app.js" as="script">
     <link rel="preload" href="src/css/style.css" as="style">
+    <style>
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -45,8 +51,8 @@
         <div id="question-section">
             <textarea id="question-input" placeholder="請輸入您的問題..."></textarea>
             <div class="button-group">
-                <button id="submit-question">排卦</button>
-                <button id="reinterpret-question" class="secondary-button">重新解卦</button>
+                <button id="submit-question" type="button">排卦</button>
+                <button id="reinterpret-question" type="button" class="secondary-button">重新解卦</button>
             </div>
         </div>
         <div id="hexagram-display">
