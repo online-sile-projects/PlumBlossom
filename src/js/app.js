@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const apiSettingsPanel = document.getElementById('api-settings');
     const reinterpretButton = document.getElementById('reinterpret-question');
     let currentQuestion = '';
+    let currentHexagram = null; // 儲存當前的卦象
     
     // 初始化時顯示歷史記錄
     historyManager.displayHistory();
@@ -20,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 設定歷史記錄項目點擊處理器
     historyManager.setHistoryItemClickHandler(record => {
         currentQuestion = record.hexagram.question; // 從 hexagram 物件中取得問題
+        currentHexagram = record.hexagram; // 保存載入的卦象
         questionInput.value = record.hexagram.question; // 同時更新輸入框
         divinationComponents.renderHexagram(record.hexagram);
         divinationComponents.displayReading(record.reading);
@@ -46,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             // 生成卦象
             const hexagram = divinationService.generateHexagram(question);
+            currentHexagram = hexagram; // 保存新生成的卦象
             
             // 顯示卦象
             divinationComponents.renderHexagram(hexagram);
@@ -125,15 +128,36 @@ document.addEventListener('DOMContentLoaded', () => {
     submitButton.addEventListener('click', async function() {
         currentQuestion = questionInput.value.trim();
         if (currentQuestion) {
+            currentHexagram = null; // 重置當前卦象，因為要重新排卦
             await performDivination(currentQuestion);
         }
     });
     
     reinterpretButton.addEventListener('click', async function() {
-        if (currentQuestion) {
-            await performDivination(currentQuestion);
-        } else {
+        if (!currentQuestion) {
             alert('請先輸入問題並進行排卦');
+            return;
+        }
+
+        if (!geminiClient.apiKey) {
+            showApiKeyError('請先設定 Gemini API 金鑰');
+            return;
+        }
+
+        try {
+            // 如果已經有卦象，就直接使用現有的
+            const hexagram = currentHexagram || divinationService.generateHexagram(currentQuestion);
+            if (!currentHexagram) {
+                currentHexagram = hexagram; // 如果是新生成的，就保存起來
+            }
+            divinationComponents.renderHexagram(hexagram);
+            divinationComponents.showLoading();
+            const reading = await divinationService.getReading(hexagram);
+            divinationComponents.displayReading(reading);
+            historyManager.addToHistory({ hexagram, reading });
+        } catch (error) {
+            console.error('解卦過程發生錯誤:', error);
+            divinationComponents.showError('解卦過程發生錯誤，請稍後再試');
         }
     });
     
@@ -150,6 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         try {
             const hexagram = divinationService.generateHexagram(question);
+            currentHexagram = hexagram; // 保存新生成的卦象
             divinationComponents.renderHexagram(hexagram);
             divinationComponents.showLoading();
             const reading = await divinationService.getReading(hexagram);
