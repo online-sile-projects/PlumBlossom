@@ -24,6 +24,23 @@ class DivinationService {
         return { lines, changingLines };
     }
 
+    // 計算互卦（交錯的爻）
+    calculateOverlappingHexagram(lines) {
+        // 互卦取第 2,3,4 爻作上卦，第 3,4,5 爻作下卦
+        const overlappingLines = [
+            lines[1], lines[2], lines[3],  // 上卦
+            lines[2], lines[3], lines[4]   // 下卦
+        ];
+        return this.calculateHexagram(overlappingLines);
+    }
+
+    // 計算伏卦（陰陽反轉）
+    calculateHiddenHexagram(lines) {
+        // 伏卦是將原卦的陰陽反轉
+        const hiddenLines = lines.map(line => line === 1 ? 0 : 1);
+        return this.calculateHexagram(hiddenLines);
+    }
+
     // 根據爻生成卦象
     generateHexagram(question) {
         const { lines, changingLines } = this.generateLines();
@@ -36,6 +53,12 @@ class DivinationService {
             changingLines[index] ? (line === 1 ? 0 : 1) : line
         );
         const changedHexagram = this.calculateHexagram(changedLines);
+
+        // 計算互卦
+        const overlappingHexagram = this.calculateOverlappingHexagram(lines);
+
+        // 計算伏卦
+        const hiddenHexagram = this.calculateHiddenHexagram(lines);
         
         return {
             original: {
@@ -45,6 +68,12 @@ class DivinationService {
             changed: {
                 ...changedHexagram,
                 lines: changedLines
+            },
+            overlapping: {
+                ...overlappingHexagram
+            },
+            hidden: {
+                ...hiddenHexagram
             },
             changingLines,
             question
