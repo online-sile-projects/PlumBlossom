@@ -97,11 +97,20 @@ ${changingLinesText}
 上卦：${hexagram.changed.upperTrigram.name}（${hexagram.changed.upperTrigram.nature}）
 下卦：${hexagram.changed.lowerTrigram.name}（${hexagram.changed.lowerTrigram.nature}）
 
+互卦：${hexagram.overlapping.hexagramName}（${hexagram.overlapping.hexagramSymbol}）
+上卦：${hexagram.overlapping.upperTrigram.name}（${hexagram.overlapping.upperTrigram.nature}）
+下卦：${hexagram.overlapping.lowerTrigram.name}（${hexagram.overlapping.lowerTrigram.nature}）
+
+伏卦：${hexagram.hidden.hexagramName}（${hexagram.hidden.hexagramSymbol}）
+上卦：${hexagram.hidden.upperTrigram.name}（${hexagram.hidden.upperTrigram.nature}）
+下卦：${hexagram.hidden.lowerTrigram.name}（${hexagram.hidden.lowerTrigram.nature}）
+
 請提供：
 1. 卦象總體解讀
 2. 變爻分析與意義
-3. 對問題的具體建議和指導
-4. 未來發展趨勢預測`;
+3. 互卦與伏卦的啟示
+4. 對問題的具體建議和指導
+5. 未來發展趨勢預測`;
     }
 
     // 提供後備解析，當 API 無法使用時
