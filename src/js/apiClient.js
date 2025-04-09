@@ -18,6 +18,7 @@ class GeminiApiClient {
 
         // 組合關於卜卦的詳細信息，作為輸入文本
         const inputText = this.createDivinationPrompt(hexagram);
+        console.log('Gemini API 輸入內容：', inputText);
 
         try {
             const response = await fetch(`${this.baseUrl}?key=${this.apiKey}`, {
