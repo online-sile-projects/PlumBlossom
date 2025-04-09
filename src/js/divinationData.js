@@ -1,13 +1,14 @@
 // 易經基本資料
 export const trigrams = {
-    qian: { name: '乾', symbol: '☰', nature: '天', attribute: '健' },
-    dui: { name: '兌', symbol: '☱', nature: '澤', attribute: '悅' },
-    li: { name: '離', symbol: '☲', nature: '火', attribute: '麗' },
+    kun: { name: '坤', symbol: '☷', nature: '地', attribute: '順' },
     zhen: { name: '震', symbol: '☳', nature: '雷', attribute: '動' },
-    xun: { name: '巽', symbol: '☴', nature: '風', attribute: '入' },
     kan: { name: '坎', symbol: '☵', nature: '水', attribute: '陷' },
+    dui: { name: '兌', symbol: '☱', nature: '澤', attribute: '悅' },
     gen: { name: '艮', symbol: '☶', nature: '山', attribute: '止' },
-    kun: { name: '坤', symbol: '☷', nature: '地', attribute: '順' }
+    li: { name: '離', symbol: '☲', nature: '火', attribute: '麗' },
+    xun: { name: '巽', symbol: '☴', nature: '風', attribute: '入' },
+    qian: { name: '乾', symbol: '☰', nature: '天', attribute: '健' }
+    
 };
 
 export const hexagramNames = {
