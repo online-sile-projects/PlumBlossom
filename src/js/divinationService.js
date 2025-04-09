@@ -31,14 +31,20 @@ class DivinationService {
             lines[1], lines[2], lines[3],  // 上卦
             lines[2], lines[3], lines[4]   // 下卦
         ];
-        return this.calculateHexagram(overlappingLines);
+        return {
+            ...this.calculateHexagram(overlappingLines),
+            lines: overlappingLines
+        };
     }
 
     // 計算伏卦（陰陽反轉）
     calculateHiddenHexagram(lines) {
         // 伏卦是將原卦的陰陽反轉
         const hiddenLines = lines.map(line => line === 1 ? 0 : 1);
-        return this.calculateHexagram(hiddenLines);
+        return {
+            ...this.calculateHexagram(hiddenLines),
+            lines: hiddenLines
+        };
     }
 
     // 根據爻生成卦象
@@ -54,10 +60,8 @@ class DivinationService {
         );
         const changedHexagram = this.calculateHexagram(changedLines);
 
-        // 計算互卦
+        // 計算互卦和伏卦
         const overlappingHexagram = this.calculateOverlappingHexagram(lines);
-
-        // 計算伏卦
         const hiddenHexagram = this.calculateHiddenHexagram(lines);
         
         return {
@@ -69,12 +73,8 @@ class DivinationService {
                 ...changedHexagram,
                 lines: changedLines
             },
-            overlapping: {
-                ...overlappingHexagram
-            },
-            hidden: {
-                ...hiddenHexagram
-            },
+            overlapping: overlappingHexagram,
+            hidden: hiddenHexagram,
             changingLines,
             question
         };

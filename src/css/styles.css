@@ -7,3 +7,24 @@
     transform: translateX(-100%);
     transition: all 0.3s ease-out;
 }
+
+.hexagrams-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.primary-hexagrams {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 2rem;
+}
+
+.secondary-hexagrams {
+    padding-top: 1rem;
+}
+
+.hexagram-row {
+    display: flex;
+    justify-content: space-around;
+    gap: 2rem;
+}

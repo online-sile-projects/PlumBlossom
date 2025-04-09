@@ -10,6 +10,8 @@ class DivinationComponents {
         const changedHexagram = hexagramData.changingLines.some(x => x)
             ? this.renderSingleHexagram(hexagramData.changed, '變卦')
             : '';
+        const overlappingHexagram = this.renderSingleHexagram(hexagramData.overlapping, '互卦');
+        const hiddenHexagram = this.renderSingleHexagram(hexagramData.hidden, '伏卦');
         
         const changingLinesInfo = hexagramData.changingLines.some(x => x)
             ? `<div class="changing-lines">
@@ -21,38 +23,60 @@ class DivinationComponents {
 
         this.hexagramDisplay.innerHTML = `
             <div class="hexagrams-container">
-                ${originalHexagram}
-                ${changingLinesInfo}
-                ${changedHexagram}
+                <div class="primary-hexagrams">
+                    ${originalHexagram}
+                    ${changingLinesInfo}
+                    ${changedHexagram}
+                </div>
+                <div class="secondary-hexagrams">
+                    <div class="hexagram-row">
+                        ${overlappingHexagram}
+                        ${hiddenHexagram}
+                    </div>
+                </div>
             </div>
         `;
     }
 
     // 渲染單個卦象
     renderSingleHexagram(hexagram, title) {
+        // 檢查資料完整性
+        if (!hexagram || !hexagram.lines || !hexagram.upperTrigram || !hexagram.lowerTrigram) {
+            console.warn(`無效的卦象資料: ${title}`);
+            return `
+                <div class="hexagram-container error">
+                    <div class="hexagram-header">
+                        <h3 class="hexagram-title">${title}</h3>
+                        <span class="hexagram-symbol">?</span>
+                        <h3 class="hexagram-name">資料錯誤</h3>
+                    </div>
+                </div>
+            `;
+        }
+
         return `
             <div class="hexagram-container">
                 <div class="hexagram-header">
                     <h3 class="hexagram-title">${title}</h3>
-                    <span class="hexagram-symbol">${hexagram.hexagramSymbol}</span>
-                    <h3 class="hexagram-name">${hexagram.hexagramName}</h3>
+                    <span class="hexagram-symbol">${hexagram.hexagramSymbol || '?'}</span>
+                    <h3 class="hexagram-name">${hexagram.hexagramName || '未知卦'}</h3>
                 </div>
                 <div class="trigrams">
                     <div class="upper-trigram">
-                        <h4>${hexagram.upperTrigram.name} ${hexagram.upperTrigram.symbol}</h4>
-                        <p>性質：${hexagram.upperTrigram.nature}</p>
+                        <h4>${hexagram.upperTrigram.name || '?'} ${hexagram.upperTrigram.symbol || ''}</h4>
+                        <p>性質：${hexagram.upperTrigram.nature || '未知'}</p>
                     </div>
                     <div class="lower-trigram">
-                        <h4>${hexagram.lowerTrigram.name} ${hexagram.lowerTrigram.symbol}</h4>
-                        <p>性質：${hexagram.lowerTrigram.nature}</p>
+                        <h4>${hexagram.lowerTrigram.name || '?'} ${hexagram.lowerTrigram.symbol || ''}</h4>
+                        <p>性質：${hexagram.lowerTrigram.nature || '未知'}</p>
                     </div>
                 </div>
                 <div class="lines">
-                    ${hexagram.lines.map((line, index) => `
+                    ${Array.isArray(hexagram.lines) ? hexagram.lines.map((line, index) => `
                         <div class="line ${line ? 'yang' : 'yin'}">
                             ${line ? '━━━━━' : '━━ ━━'}
                         </div>
-                    `).join('')}
+                    `).join('') : '<div class="error">無效的爻線資料</div>'}
                 </div>
             </div>
         `;
