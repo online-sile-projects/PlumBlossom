@@ -1,3 +1,5 @@
+import { divinationComponents } from './components.js';
+
 // 歷史記錄管理類
 export class HistoryManager {
     constructor() {
@@ -34,6 +36,14 @@ export class HistoryManager {
         this.displayHistory();
     }
 
+    // 刪除單筆歷史記錄
+    deleteHistoryItem(timestamp) {
+        let history = this.getHistory();
+        history = history.filter(item => item.timestamp !== timestamp);
+        localStorage.setItem(this.historyKey, JSON.stringify(history));
+        this.displayHistory();
+    }
+
     // 顯示歷史記錄
     displayHistory() {
         const history = this.getHistory();
@@ -56,7 +66,10 @@ export class HistoryManager {
         // 顯示歷史記錄列表
         historyList.innerHTML = history.map(record => `
             <div class="history-item" data-record='${JSON.stringify(record)}'>
-                <div class="date">${new Date(record.timestamp).toLocaleString('zh-TW')}</div>
+                <div class="date">
+                    ${new Date(record.timestamp).toLocaleString('zh-TW')}
+                    <button class="delete-item" data-timestamp="${record.timestamp}">✕</button>
+                </div>
                 <div class="question">${record.hexagram.question}</div>
                 <div class="hexagram-info">
                     <span>${record.hexagram.original.hexagramName} ${record.hexagram.original.hexagramSymbol}</span>
@@ -69,9 +82,29 @@ export class HistoryManager {
 
         // 為每個歷史記錄項添加點擊事件
         historyList.querySelectorAll('.history-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const record = JSON.parse(item.dataset.record);
-                this.onHistoryItemClick(record);
+            item.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('delete-item')) {
+                    const record = JSON.parse(item.dataset.record);
+                    this.onHistoryItemClick(record);
+                }
+            });
+        });
+
+        // 為刪除按鈕添加點擊事件
+        historyList.querySelectorAll('.delete-item').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const timestamp = button.dataset.timestamp;
+                if (divinationComponents) {
+                    divinationComponents.showDeleteConfirm(timestamp, (confirmedTimestamp) => {
+                        this.deleteHistoryItem(confirmedTimestamp);
+                    });
+                } else {
+                    // 如果 divinationComponents 不可用，使用基本確認
+                    if (confirm('確定要刪除這筆紀錄嗎？')) {
+                        this.deleteHistoryItem(timestamp);
+                    }
+                }
             });
         });
     }

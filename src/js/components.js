@@ -73,6 +73,21 @@ class DivinationComponents {
         this.readingResult.innerHTML = '<div class="loading">解卦中...</div>';
     }
 
+    // 顯示刪除確認提示
+    showDeleteConfirm(timestamp, onConfirm) {
+        const item = document.querySelector(`[data-timestamp="${timestamp}"]`).closest('.history-item');
+        item.classList.add('deleting');
+        
+        if (confirm('確定要刪除這筆紀錄嗎？')) {
+            item.classList.add('fade-out');
+            setTimeout(() => {
+                onConfirm(timestamp);
+            }, 300);
+        } else {
+            item.classList.remove('deleting');
+        }
+    }
+
     // 顯示錯誤訊息
     showError(message) {
         this.readingResult.innerHTML = `<div class="error">${message}</div>`;
