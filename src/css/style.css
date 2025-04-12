@@ -408,3 +408,22 @@ h1 {
 .secondary-button:hover {
     background-color: #5a6268;
 }
+
+.note-section {
+    margin-top: 8px;
+}
+
+.note-input {
+    width: 100%;
+    min-height: 60px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    font-size: 14px;
+}
+
+.note-input:focus {
+    outline: none;
+    border-color: #666;
+}

@@ -18,7 +18,8 @@ export class HistoryManager {
         let history = this.getHistory();
         history.unshift({
             ...record,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            note: ''  // 新增備註欄位
         });
 
         // 限制歷史記錄數量
@@ -26,6 +27,19 @@ export class HistoryManager {
             history = history.slice(0, this.maxHistoryItems);
         }
 
+        localStorage.setItem(this.historyKey, JSON.stringify(history));
+        this.displayHistory();
+    }
+
+    // 新增編輯備註的方法
+    updateNote(timestamp, note) {
+        let history = this.getHistory();
+        history = history.map(item => {
+            if (item.timestamp === timestamp) {
+                return { ...item, note };
+            }
+            return item;
+        });
         localStorage.setItem(this.historyKey, JSON.stringify(history));
         this.displayHistory();
     }
@@ -77,8 +91,20 @@ export class HistoryManager {
                         `<span>→</span><span>${record.hexagram.changed.hexagramName} ${record.hexagram.changed.hexagramSymbol}</span>` 
                         : ''}
                 </div>
+                <div class="note-section">
+                    <textarea class="note-input" placeholder="點擊此處添加備註..." data-timestamp="${record.timestamp}">${record.note || ''}</textarea>
+                </div>
             </div>
         `).join('');
+
+        // 為備註輸入框添加事件監聽
+        historyList.querySelectorAll('.note-input').forEach(textarea => {
+            textarea.addEventListener('change', (e) => {
+                const timestamp = e.target.dataset.timestamp;
+                const note = e.target.value;
+                this.updateNote(timestamp, note);
+            });
+        });
 
         // 為每個歷史記錄項添加點擊事件
         historyList.querySelectorAll('.history-item').forEach(item => {
