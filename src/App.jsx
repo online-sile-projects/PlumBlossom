@@ -17,7 +17,7 @@ function App() {
           ...plumBlossom,
           data: data.default,
           performDivination: (question) => {
-            return plumBlossom.divination(question, data.default.hexagrams);
+            return plumBlossom.divination(question, data.default);
           }
         };
         
