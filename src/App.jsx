@@ -1,21 +1,55 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import MyTemplate from './template/index.js'
+import PlumBlossomDivination from './components/PlumBlossomDivination'
+import './styles/PlumBlossomDivination.css'
 
 function App() {
+  const [showConsoleInstructions, setShowConsoleInstructions] = useState(true);
+  
+  // 在控制台中暴露梅花易數的功能
+  useEffect(() => {
+    // 引入數據和工具函數
+    import('./utils/plumBlossom').then(plumBlossom => {
+      import('./assets/data.json').then(data => {
+        // 在全局對象中添加梅花易數功能
+        window.PlumBlossom = {
+          ...plumBlossom,
+          data: data.default,
+          performDivination: (question) => {
+            return plumBlossom.divination(question, data.default.hexagrams);
+          }
+        };
+        
+        // 顯示說明
+        console.log('%c梅花易數排盤工具已加載', 'font-size: 16px; color: #4CAF50; font-weight: bold;');
+        console.log('%c使用方法：', 'color: #2196F3;');
+        console.log('PlumBlossom.performDivination("你的問題") - 進行排盤並返回結果');
+        console.log('PlumBlossom.getHistoryFromLocalStorage() - 獲取歷史記錄');
+      });
+    });
+  }, []);
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <h1 className="text-3xl font-bold mb-4">專案模板</h1>
-      <p className="mb-4">這是一個簡單的專案模板，可在 Chrome 控制台中互動</p>
-      <p className="text-lg">請按 F12 或右鍵選擇「檢查」開啟開發者工具</p>
-      <p className="text-lg">然後切換到「控制台」標籤開始使用</p>
-      <div className="mt-8 p-4 bg-gray-200 rounded-lg">
-        <h2 className="text-xl font-bold mb-2">基本指令：</h2>
-        <pre className="font-mono bg-gray-800 text-green-400 p-4 rounded">
-          MyTemplate.sayHello()     // 顯示問候語
-          MyTemplate.currentTime()  // 顯示目前時間
-          MyTemplate.help()         // 顯示說明
-        </pre>
+    <div className="min-h-screen bg-gray-100">
+      {showConsoleInstructions && (
+        <div className="p-4 bg-yellow-100 text-yellow-800 flex justify-between items-center">
+          <div>
+            <p className="font-bold">提示：</p>
+            <p>您可以在 Chrome 控制台中使用 <code>PlumBlossom.performDivination("問題")</code> 進行排盤</p>
+          </div>
+          <button 
+            onClick={() => setShowConsoleInstructions(false)}
+            className="px-3 py-1 bg-yellow-200 rounded hover:bg-yellow-300"
+          >
+            關閉
+          </button>
+        </div>
+      )}
+      
+      <div className="container mx-auto p-4">
+        <h1 className="text-3xl font-bold mb-4 text-center">梅花易數排盤系統</h1>
+        <PlumBlossomDivination />
       </div>
     </div>
   )
