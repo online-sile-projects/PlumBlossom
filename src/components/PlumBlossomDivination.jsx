@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { divination, getHistoryFromLocalStorage } from '../utils/plumBlossom';
+import LLMDivinationAnalysis from './LLMDivinationAnalysis';
+import '../styles/LLMDivinationAnalysis.css';
 
 // 導入易經資料
 import hexagramsData from '../assets/data.json';
@@ -254,6 +256,9 @@ const PlumBlossomDivination = () => {
               title="伏卦"
             />
           </div>
+          
+          {/* LLM 論掛分析 */}
+          <LLMDivinationAnalysis divinationResult={result} />
         </div>
       )}
       
