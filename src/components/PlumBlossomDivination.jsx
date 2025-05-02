@@ -65,22 +65,42 @@ const HexagramDisplay = ({ hexagram, title, changingLines = [] }) => {
             {hexagram.yaoCombination.initial && (
               <div className="yao-text-item">
                 <strong>初爻 ({hexagram.yao[0].name}):</strong> {hexagram.yaoCombination.initial.text}
+                {hexagram.yaoCombination.initial.description?.text && (
+                  <div className="yao-translation">
+                    <em>白話翻譯: {hexagram.yaoCombination.initial.description.text}</em>
+                  </div>
+                )}
               </div>
             )}
             {hexagram.yaoCombination.fifth && (
               <div className="yao-text-item">
                 <strong>五爻 ({hexagram.yao[4].name}):</strong> {hexagram.yaoCombination.fifth.text}
+                {hexagram.yaoCombination.fifth.description?.text && (
+                  <div className="yao-translation">
+                    <em>白話翻譯: {hexagram.yaoCombination.fifth.description.text}</em>
+                  </div>
+                )}
               </div>
             )}
             {hexagram.yaoCombination.usage && (
               <div className="yao-text-item">
                 <strong>用爻 ({hexagram.yao[6].name}):</strong> {hexagram.yaoCombination.usage.text}
+                {hexagram.yaoCombination.usage.description?.text && (
+                  <div className="yao-translation">
+                    <em>白話翻譯: {hexagram.yaoCombination.usage.description.text}</em>
+                  </div>
+                )}
               </div>
             )}
             
             {changingLines.map(lineNumber => (
               <div key={lineNumber} className="changing-yao-text">
                 <strong>變爻 ({hexagram.yao[lineNumber-1].name}):</strong> {hexagram.yao[lineNumber-1].text}
+                {hexagram.yao[lineNumber-1].description?.text && (
+                  <div className="yao-translation">
+                    <em>白話翻譯: {hexagram.yao[lineNumber-1].description.text}</em>
+                  </div>
+                )}
               </div>
             ))}
           </div>
