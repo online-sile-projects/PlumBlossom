@@ -7,10 +7,34 @@ import hexagramsData from '../assets/data.json';
 // 卦象顯示組件
 const HexagramDisplay = ({ hexagram, title, changingLines = [] }) => {
   if (!hexagram) return <div>加載中...</div>;
+  
+  // 上掛下掛資訊
+  const hasTrigramInfo = hexagram.topTrigramInfo && hexagram.bottomTrigramInfo;
 
   return (
     <div className="hexagram-display">
       <h3>{title} - {hexagram.name} ({hexagram.character})</h3>
+      
+      {/* 上掛下掛資訊 */}
+      {hasTrigramInfo && (
+        <div className="trigram-info">
+          <div className="trigram-info-container">
+            <div className="top-trigram">
+              <h4>上掛: {hexagram.topTrigramInfo.name} {hexagram.topTrigramInfo.character}</h4>
+              <p>性質: {hexagram.topTrigramInfo.nature}</p>
+              <p>五行: {hexagram.topTrigramInfo.element}</p>
+              <p>家族: {hexagram.topTrigramInfo.family}</p>
+            </div>
+            <div className="bottom-trigram">
+              <h4>下掛: {hexagram.bottomTrigramInfo.name} {hexagram.bottomTrigramInfo.character}</h4>
+              <p>性質: {hexagram.bottomTrigramInfo.nature}</p>
+              <p>五行: {hexagram.bottomTrigramInfo.element}</p>
+              <p>家族: {hexagram.bottomTrigramInfo.family}</p>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <div className="hexagram-lines">
         {hexagram.binary.split('').map((bit, index) => {
           // 注意：索引是從0開始，但爻的位置是從下往上數，從1開始
@@ -27,8 +51,39 @@ const HexagramDisplay = ({ hexagram, title, changingLines = [] }) => {
           );
         })}
       </div>
+      
       <p className="hexagram-text">{hexagram.text}</p>
       <p className="hexagram-description">{hexagram.description.text}</p>
+      
+      {/* 論卦時用到的爻辭 */}
+      {hexagram.yaoCombination && (
+        <div className="yao-texts">
+          <h4>論卦關鍵爻辭</h4>
+          <div className="yao-text-container">
+            {hexagram.yaoCombination.initial && (
+              <div className="yao-text-item">
+                <strong>初爻 ({hexagram.yao[0].name}):</strong> {hexagram.yaoCombination.initial.text}
+              </div>
+            )}
+            {hexagram.yaoCombination.fifth && (
+              <div className="yao-text-item">
+                <strong>五爻 ({hexagram.yao[4].name}):</strong> {hexagram.yaoCombination.fifth.text}
+              </div>
+            )}
+            {hexagram.yaoCombination.usage && (
+              <div className="yao-text-item">
+                <strong>用爻 ({hexagram.yao[6].name}):</strong> {hexagram.yaoCombination.usage.text}
+              </div>
+            )}
+            
+            {changingLines.map(lineNumber => (
+              <div key={lineNumber} className="changing-yao-text">
+                <strong>變爻 ({hexagram.yao[lineNumber-1].name}):</strong> {hexagram.yao[lineNumber-1].text}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -54,12 +109,52 @@ const DivinationHistory = ({ history, onSelectHistory }) => {
 };
 
 // 主要排盤組件
+// 上下掛互動分析組件
+const TrigramAnalysis = ({ hexagram }) => {
+  if (!hexagram || !hexagram.topTrigramInfo || !hexagram.bottomTrigramInfo) {
+    return null;
+  }
+  
+  const { topTrigramInfo, bottomTrigramInfo } = hexagram;
+  
+  return (
+    <div className="trigram-analysis">
+      <h3>上下掛互動分析</h3>
+      <div className="analysis-content">
+        <p>
+          <strong>整體概述：</strong> 
+          此卦由{bottomTrigramInfo.name}卦({bottomTrigramInfo.nature})在下，{topTrigramInfo.name}卦({topTrigramInfo.nature})在上組成，
+          整體表現為「{bottomTrigramInfo.nature}{topTrigramInfo.nature}」之象。
+        </p>
+        <p>
+          <strong>五行關係：</strong>
+          下卦五行屬{bottomTrigramInfo.element}，上卦五行屬{topTrigramInfo.element}。
+          {bottomTrigramInfo.element === topTrigramInfo.element ? 
+            `兩者相同，呈現${bottomTrigramInfo.element}生${bottomTrigramInfo.element}的和諧之象。` : 
+            `兩者五行互動，形成複雜的關係。`}
+        </p>
+        <p>
+          <strong>卦位情況：</strong>
+          下卦代表內在或基礎，表示{bottomTrigramInfo.name}({bottomTrigramInfo.nature})；
+          上卦代表外在或表現，表示{topTrigramInfo.name}({topTrigramInfo.nature})。
+          這種內外組合反映出事物發展的內在動力與外部條件。
+        </p>
+        <p>
+          <strong>卦象變化：</strong>
+          若有變爻，則卦象將產生相應變化，從而呈現事物發展的趨勢。
+        </p>
+      </div>
+    </div>
+  );
+};
+
 const PlumBlossomDivination = () => {
   const [question, setQuestion] = useState('');
   const [result, setResult] = useState(null);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showAnalysis, setShowAnalysis] = useState(false);
 
   // 載入歷史記錄
   useEffect(() => {
@@ -84,7 +179,7 @@ const PlumBlossomDivination = () => {
 
     try {
       // 執行排盤算法
-      const divinationResult = divination(question, hexagramsData.hexagrams);
+      const divinationResult = divination(question, hexagramsData);
       
       setResult(divinationResult);
       
@@ -128,6 +223,14 @@ const PlumBlossomDivination = () => {
         <div className="divination-result">
           <h3>問題: {result.question}</h3>
           <p>排盤時間: {new Date(result.timestamp).toLocaleString()}</p>
+          
+          <div className="analysis-toggle">
+            <button onClick={() => setShowAnalysis(!showAnalysis)}>
+              {showAnalysis ? '隱藏上下掛分析' : '顯示上下掛分析'}
+            </button>
+          </div>
+          
+          {showAnalysis && <TrigramAnalysis hexagram={result.mainHexagram} />}
           
           <div className="hexagrams-container">
             <HexagramDisplay 
