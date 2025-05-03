@@ -122,7 +122,11 @@ const DivinationHistory = ({ history, onSelectHistory }) => {
       <ul>
         {history.map((item, index) => (
           <li key={index} onClick={() => onSelectHistory(item)}>
-            <strong>{item.question}</strong> - {item.mainHexagram.name} ({new Date(item.timestamp).toLocaleString()})
+            <strong>{item.question}</strong>
+            {item.mainHexagram && item.mainHexagram.name ? 
+              <> - {item.mainHexagram.name} ({new Date(item.timestamp).toLocaleString()})</> : 
+              <> ({new Date(item.timestamp).toLocaleString()})</>
+            }
           </li>
         ))}
       </ul>
@@ -218,8 +222,14 @@ const PlumBlossomDivination = () => {
 
   // 選擇歷史記錄
   const handleSelectHistory = (historyItem) => {
-    setResult(historyItem);
-    setQuestion(historyItem.question);
+    // 確保歷史記錄項目有效
+    if (historyItem && historyItem.question && historyItem.mainHexagram) {
+      setResult(historyItem);
+      setQuestion(historyItem.question);
+    } else {
+      console.warn('嘗試載入無效的歷史記錄');
+      setError('無效的歷史記錄項目');
+    }
   };
 
   return (

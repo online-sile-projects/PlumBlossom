@@ -173,7 +173,15 @@ const saveToLocalStorage = (divinationResult) => {
 // 從 localStorage 獲取歷史記錄
 const getHistoryFromLocalStorage = () => {
   const historyKey = 'plumBlossom_history';
-  return JSON.parse(localStorage.getItem(historyKey) || '[]');
+  const rawHistory = JSON.parse(localStorage.getItem(historyKey) || '[]');
+  
+  // 過濾不完整或無效的歷史記錄
+  return rawHistory.filter(item => 
+    item && 
+    item.question && 
+    item.mainHexagram && 
+    item.mainHexagram.name
+  );
 };
 
 // 增強卦象資訊，添加上掛下掛詳細資料
