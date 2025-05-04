@@ -3,6 +3,43 @@
  * 負責生成與易經相關的提示詞
  */
 
+// 生成卦象爻辭提示詞
+const generateYaoCombinationPrompt = (hexagram, hexagramType) => {
+  let prompt = '';
+  
+  if (!hexagram || !hexagram.yaoCombination) {
+    return prompt;
+  }
+  
+  prompt += `\n${hexagramType}關鍵爻辭：\n`;
+  
+  // 初爻
+  if (hexagram.yaoCombination.initial) {
+    prompt += `初爻：${hexagram.yaoCombination.initial.text}\n`;
+    if (hexagram.yaoCombination.initial.description?.text) {
+      prompt += `初爻白話翻譯：${hexagram.yaoCombination.initial.description.text}\n`;
+    }
+  }
+  
+  // 五爻
+  if (hexagram.yaoCombination.fifth) {
+    prompt += `五爻：${hexagram.yaoCombination.fifth.text}\n`;
+    if (hexagram.yaoCombination.fifth.description?.text) {
+      prompt += `五爻白話翻譯：${hexagram.yaoCombination.fifth.description.text}\n`;
+    }
+  }
+  
+  // 用爻
+  if (hexagram.yaoCombination.usage) {
+    prompt += `用爻：${hexagram.yaoCombination.usage.text}\n`;
+    if (hexagram.yaoCombination.usage.description?.text) {
+      prompt += `用爻白話翻譯：${hexagram.yaoCombination.usage.description.text}\n`;
+    }
+  }
+  
+  return prompt;
+};
+
 // 生成解盤提示詞
 export const generateDivinationPrompt = (divinationResult) => {
   if (!divinationResult || !divinationResult.mainHexagram) {
@@ -22,18 +59,30 @@ export const generateDivinationPrompt = (divinationResult) => {
   prompt += `本卦：${mainHexagram.name} (${mainHexagram.character})\n`;
   prompt += `卦辭：${mainHexagram.text}\n`;
   prompt += `上掛：${mainHexagram.topTrigramInfo.name} (${mainHexagram.topTrigramInfo.nature}、${mainHexagram.topTrigramInfo.element})\n`;
-  prompt += `下掛：${mainHexagram.bottomTrigramInfo.name} (${mainHexagram.bottomTrigramInfo.nature}、${mainHexagram.bottomTrigramInfo.element})\n\n`;
+  prompt += `下掛：${mainHexagram.bottomTrigramInfo.name} (${mainHexagram.bottomTrigramInfo.nature}、${mainHexagram.bottomTrigramInfo.element})\n`;
+  
+  // 添加本卦關鍵爻辭
+  prompt += generateYaoCombinationPrompt(mainHexagram, '本卦');
+  prompt += '\n';
   
   // 互卦資訊
   if (overlappingHexagram) {
     prompt += `互卦：${overlappingHexagram.name} (${overlappingHexagram.character})\n`;
-    prompt += `卦辭：${overlappingHexagram.text}\n\n`;
+    prompt += `卦辭：${overlappingHexagram.text}\n`;
+    
+      // 添加互卦關鍵爻辭
+    prompt += generateYaoCombinationPrompt(overlappingHexagram, '互卦');
+    prompt += '\n';
   }
   
   // 伏卦資訊
   if (hiddenHexagram) {
     prompt += `伏卦：${hiddenHexagram.name} (${hiddenHexagram.character})\n`;
-    prompt += `卦辭：${hiddenHexagram.text}\n\n`;
+    prompt += `卦辭：${hiddenHexagram.text}\n`;
+    
+    // 添加伏卦關鍵爻辭
+    prompt += generateYaoCombinationPrompt(hiddenHexagram, '伏卦');
+    prompt += '\n';
   }
   
   // 變爻資訊
@@ -50,10 +99,14 @@ export const generateDivinationPrompt = (divinationResult) => {
     if (changedHexagram) {
       prompt += `\n變卦：${changedHexagram.name} (${changedHexagram.character})\n`;
       prompt += `卦辭：${changedHexagram.text}\n`;
+      
+      // 添加變卦關鍵爻辭
+      prompt += generateYaoCombinationPrompt(changedHexagram, '變卦');
+      prompt += '\n';
     }
   }
   
-  prompt += `\n請提供以下內容：\n`;
+  prompt += `請提供以下內容：\n`;
   prompt += `1. 卦象解釋：分析本卦的基本含義\n`;
   prompt += `2. 問題解析：針對我的問題提供有針對性的解讀\n`;
   
@@ -71,7 +124,7 @@ export const generateDivinationPrompt = (divinationResult) => {
   }
   
   prompt += `7. 建議與總結：給予實際可行的建議\n\n`;
-  prompt += `請用易經的觀點分析，避免���泛籠統的回答，盡量具體且有深度。`;
+  prompt += `請用易經的觀點分析，避免泛泛籠統的回答，盡量具體且有深度。`;
   
   return prompt;
 };
