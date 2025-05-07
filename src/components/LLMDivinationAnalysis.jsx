@@ -5,35 +5,6 @@ const LLMDivinationAnalysis = ({ divinationResult }) => {
   const [showPrompt, setShowPrompt] = useState(true);
   const [copied, setCopied] = useState(false);
   
-  // 生成提示詞
-  const generateDivinationPrompt = (result) => {
-    if (!result || !result.mainHexagram) return '';
-    
-    const mainHex = result.mainHexagram;
-    const changedHex = result.changedHexagram;
-    const changingLines = result.changingLines || [];
-    
-    let prompt = `我正在進行梅花易數卜卦，請幫我解讀以下卦象：\n\n`;
-    prompt += `本卦：${mainHex.name}卦 (${mainHex.symbol})\n`;
-    
-    if (changedHex && mainHex.symbol !== changedHex.symbol) {
-      prompt += `變卦：${changedHex.name}卦 (${changedHex.symbol})\n`;
-    }
-    
-    if (changingLines.length > 0) {
-      prompt += `變爻：${changingLines.join(', ')}\n`;
-    }
-    
-    // 加入問題
-    if (result.question) {
-      prompt += `\n我的問題是：${result.question}\n`;
-    }
-    
-    prompt += `\n請提供詳細的卦象解釋、吉凶、事態發展趨勢，以及對我的問題的建議。`;
-    
-    return prompt;
-  };
-  
   // 使用內部函式生成提示詞
   const prompt = generateDivinationPrompt(divinationResult);
   
