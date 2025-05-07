@@ -8,7 +8,7 @@ const LLMDivinationAnalysis = ({ divinationResult }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [interpretation, setInterpretation] = useState('');
-  const [showPrompt, setShowPrompt] = useState(false);
+  const [showPrompt, setShowPrompt] = useState(true);
   const [copied, setCopied] = useState(false);
   
   // 生成提示詞
@@ -48,6 +48,11 @@ const LLMDivinationAnalysis = ({ divinationResult }) => {
     }
   };
 
+  // 開啟 LLM 網站函式
+  const openLLMWebsite = (url) => {
+    window.open(url, '_blank');
+  };
+  
   if (!divinationResult || !divinationResult.mainHexagram) {
     return null;
   }
@@ -107,9 +112,33 @@ const LLMDivinationAnalysis = ({ divinationResult }) => {
         </div>
         
         {showPrompt && (
-          <div className="prompt-content">
-            <pre>{prompt}</pre>
-          </div>
+          <>
+            <div className="prompt-content">
+              <pre>{prompt}</pre>
+            </div>
+            
+            <div className="llm-quick-links">
+              <h4>快速連結到 LLM 網站</h4>
+              <div className="llm-buttons">
+                <button onClick={() => openLLMWebsite('https://chat.deepseek.com/')}>
+                  DeepSeek
+                </button>
+                <button onClick={() => openLLMWebsite('https://chatgpt.com/')}>
+                  ChatGPT
+                </button>
+                <button onClick={() => openLLMWebsite('https://gemini.google.com/app')}>
+                  Gemini
+                </button>
+                <button onClick={() => openLLMWebsite('https://claude.ai/')}>
+                  Claude
+                </button>
+                <button onClick={() => openLLMWebsite('https://www.perplexity.ai/')}>
+                  Perplexity
+                </button>
+              </div>
+              <p className="hint">提示：複製上方提示詞後點擊按鈕前往您喜好的 LLM 網站貼上使用</p>
+            </div>
+          </>
         )}
       </div>
       
