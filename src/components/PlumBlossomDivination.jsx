@@ -206,7 +206,7 @@ const PlumBlossomDivination = () => {
     }
   }, []);
 
-  // 執行排盤
+  // 修改執行排盤的處理函式
   const handleDivination = () => {
     if (!question.trim()) {
       setError('請輸入您的問題');
@@ -222,8 +222,17 @@ const PlumBlossomDivination = () => {
       
       setResult(divinationResult);
       
-      // 更新歷史記錄
-      setHistory([divinationResult, ...history].slice(0, 20));
+      // 取得最新的歷史記錄
+      const currentHistory = getHistoryFromLocalStorage();
+      
+      // 更新歷史記錄（加入新結果到最前面）
+      const updatedHistory = [divinationResult, ...currentHistory].slice(0, 20);
+      
+      // 更新 localStorage
+      localStorage.setItem('plumBlossomHistory', JSON.stringify(updatedHistory));
+      
+      // 更新狀態
+      setHistory(updatedHistory);
       
       setLoading(false);
     } catch (err) {
@@ -248,20 +257,23 @@ const PlumBlossomDivination = () => {
   // 新增刪除歷史記錄的處理函式
   const handleDeleteHistory = (index) => {
     try {
-      // 從 localStorage 中取得最新歷史記錄
-      let savedHistory = getHistoryFromLocalStorage();
+      // 複製當前狀態的歷史記錄
+      const currentHistory = [...history];
       
-      // 刪除指定索引的記錄
-      savedHistory.splice(index, 1);
+      // 保存要比較的被刪除項目
+      const deletedItem = currentHistory[index];
+      
+      // 從記錄中刪除
+      currentHistory.splice(index, 1);
       
       // 更新 localStorage
-      localStorage.setItem('plumBlossomHistory', JSON.stringify(savedHistory));
+      localStorage.setItem('plumBlossomHistory', JSON.stringify(currentHistory));
       
-      // 更新狀態（不使用重新載入頁面的方式）
-      setHistory(savedHistory);
+      // 更新狀態
+      setHistory(currentHistory);
       
       // 如果目前顯示的結果是被刪除的記錄，則清除顯示
-      if (result && result === history[index]) {
+      if (result && result.timestamp === deletedItem.timestamp && result.question === deletedItem.question) {
         setResult(null);
         setQuestion('');
       }
