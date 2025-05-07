@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import LLMResponseRecorder from './LLMResponseRecorder';
-import { generateDivinationPrompt } from '../utils/llm/promptGenerator';
+import { generateDivinationPrompt } from '../utils/promptGenerator';
 
 const LLMDivinationAnalysis = ({ divinationResult }) => {
   const [showPrompt, setShowPrompt] = useState(true);

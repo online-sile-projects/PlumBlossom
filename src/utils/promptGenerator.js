@@ -3,7 +3,42 @@
  * 負責生成與易經相關的提示詞
  */
 
-
+// 生成卦象爻辭提示詞
+const generateYaoCombinationPrompt = (hexagram, hexagramType) => {
+  let prompt = '';
+  
+  if (!hexagram || !hexagram.yaoCombination) {
+    return prompt;
+  }
+  
+  prompt += `\n${hexagramType}關鍵爻辭：\n`;
+  
+  // 初爻
+  if (hexagram.yaoCombination.initial) {
+    prompt += `初爻：${hexagram.yaoCombination.initial.text}\n`;
+    if (hexagram.yaoCombination.initial.description?.text) {
+      prompt += `初爻白話翻譯：${hexagram.yaoCombination.initial.description.text}\n`;
+    }
+  }
+  
+  // 五爻
+  if (hexagram.yaoCombination.fifth) {
+    prompt += `五爻：${hexagram.yaoCombination.fifth.text}\n`;
+    if (hexagram.yaoCombination.fifth.description?.text) {
+      prompt += `五爻白話翻譯：${hexagram.yaoCombination.fifth.description.text}\n`;
+    }
+  }
+  
+  // 用爻
+  if (hexagram.yaoCombination.usage) {
+    prompt += `用爻：${hexagram.yaoCombination.usage.text}\n`;
+    if (hexagram.yaoCombination.usage.description?.text) {
+      prompt += `用爻白話翻譯：${hexagram.yaoCombination.usage.description.text}\n`;
+    }
+  }
+  
+  return prompt;
+};
 
 // 生成解盤提示詞
 export const generateDivinationPrompt = (divinationResult) => {
