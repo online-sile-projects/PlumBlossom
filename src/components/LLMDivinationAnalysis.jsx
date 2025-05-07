@@ -1,17 +1,39 @@
 import React, { useState } from 'react';
-import { generateDivinationPrompt, callLLMAPI } from '../utils/llmApi';
 
 const LLMDivinationAnalysis = ({ divinationResult }) => {
-  const [apiKey, setApiKey] = useState('');
-  const [apiType, setApiType] = useState('openai');
-  const [customApiUrl, setCustomApiUrl] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [interpretation, setInterpretation] = useState('');
   const [showPrompt, setShowPrompt] = useState(true);
   const [copied, setCopied] = useState(false);
   
   // 生成提示詞
+  const generateDivinationPrompt = (result) => {
+    if (!result || !result.mainHexagram) return '';
+    
+    const mainHex = result.mainHexagram;
+    const changedHex = result.changedHexagram;
+    const changingLines = result.changingLines || [];
+    
+    let prompt = `我正在進行梅花易數卜卦，請幫我解讀以下卦象：\n\n`;
+    prompt += `本卦：${mainHex.name}卦 (${mainHex.symbol})\n`;
+    
+    if (changedHex && mainHex.symbol !== changedHex.symbol) {
+      prompt += `變卦：${changedHex.name}卦 (${changedHex.symbol})\n`;
+    }
+    
+    if (changingLines.length > 0) {
+      prompt += `變爻：${changingLines.join(', ')}\n`;
+    }
+    
+    // 加入問題
+    if (result.question) {
+      prompt += `\n我的問題是：${result.question}\n`;
+    }
+    
+    prompt += `\n請提供詳細的卦象解釋、吉凶、事態發展趨勢，以及對我的問題的建議。`;
+    
+    return prompt;
+  };
+  
+  // 使用內部函式生成提示詞
   const prompt = generateDivinationPrompt(divinationResult);
   
   // 複製提示詞到剪貼板
@@ -23,29 +45,7 @@ const LLMDivinationAnalysis = ({ divinationResult }) => {
       })
       .catch(err => {
         console.error('無法複製文本: ', err);
-        setError('複製失敗，請手動選取複製');
       });
-  };
-  
-  // 呼叫 LLM API
-  const handleCallAPI = async () => {
-    if (!apiKey) {
-      setError('請輸入 API 金鑰');
-      return;
-    }
-    
-    setIsLoading(true);
-    setError('');
-    
-    try {
-      const result = await callLLMAPI(prompt, apiType, apiKey, customApiUrl || undefined);
-      setInterpretation(result);
-      setIsLoading(false);
-    } catch (err) {
-      console.error('API 呼叫錯誤:', err);
-      setError(`API 呼叫失敗: ${err.message}`);
-      setIsLoading(false);
-    }
   };
 
   // 開啟 LLM 網站函式
@@ -60,44 +60,6 @@ const LLMDivinationAnalysis = ({ divinationResult }) => {
   return (
     <div className="llm-divination-analysis">
       <h3>LLM 論掛分析</h3>
-      
-      <div className="api-selection">
-        <div className="form-group">
-          <label>選擇 LLM API:</label>
-          <select 
-            value={apiType} 
-            onChange={(e) => setApiType(e.target.value)}
-            disabled={isLoading}
-          >
-            <option value="openai">ChatGPT (OpenAI)</option>
-            <option value="gemini">Gemini (Google)</option>
-            <option value="deepseek">DeepSeek</option>
-          </select>
-        </div>
-        
-        <div className="form-group">
-          <label>API 金鑰:</label>
-          <input 
-            type="password" 
-            value={apiKey} 
-            onChange={(e) => setApiKey(e.target.value)}
-            placeholder="請輸入 API 金鑰"
-            disabled={isLoading} 
-          />
-        </div>
-        
-        <div className="form-group">
-          <label>自訂 API 端點 (選填):</label>
-          <input 
-            type="text" 
-            value={customApiUrl} 
-            onChange={(e) => setCustomApiUrl(e.target.value)}
-            placeholder="例如: https://your-proxy.com/v1/chat/completions"
-            disabled={isLoading} 
-          />
-          <small>若您使用自己的代理伺服器，可以在此輸入完整 URL</small>
-        </div>
-      </div>
       
       <div className="prompt-section">
         <div className="prompt-header">
@@ -141,33 +103,6 @@ const LLMDivinationAnalysis = ({ divinationResult }) => {
           </>
         )}
       </div>
-      
-      <div className="api-action">
-        <button 
-          onClick={handleCallAPI} 
-          disabled={isLoading || !apiKey}
-          className="call-api-btn"
-        >
-          {isLoading ? '分析中...' : '呼叫 LLM API 進行論掛'}
-        </button>
-      </div>
-      
-      {error && (
-        <div className="error-message">
-          {error}
-        </div>
-      )}
-      
-      {interpretation && (
-        <div className="interpretation-result">
-          <h4>解卦結果</h4>
-          <div className="interpretation-content">
-            {interpretation.split('\n').map((line, index) => (
-              <p key={index}>{line}</p>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
