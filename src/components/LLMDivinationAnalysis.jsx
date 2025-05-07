@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import LLMResponseRecorder from './LLMResponseRecorder';
 
 const LLMDivinationAnalysis = ({ divinationResult }) => {
   const [showPrompt, setShowPrompt] = useState(true);
@@ -103,6 +104,9 @@ const LLMDivinationAnalysis = ({ divinationResult }) => {
           </>
         )}
       </div>
+      
+      {/* 新增 LLM 回覆紀錄元件 */}
+      <LLMResponseRecorder divinationResult={divinationResult} />
     </div>
   );
 };

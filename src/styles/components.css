@@ -1,0 +1,91 @@
+/* LLM Response Recorder 樣式 */
+.llm-response-recorder {
+  margin-top: 2rem;
+  border-top: 1px solid #ddd;
+  padding-top: 1rem;
+}
+
+.llm-response-recorder .tabs {
+  display: flex;
+  margin-bottom: 1rem;
+}
+
+.llm-response-recorder .tabs button {
+  padding: 0.5rem 1rem;
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.llm-response-recorder .tabs button.active {
+  background: #fff;
+  border-bottom-color: #fff;
+  font-weight: bold;
+}
+
+.llm-response-recorder .form-group {
+  margin-bottom: 1rem;
+}
+
+.llm-response-recorder .form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.llm-response-recorder textarea,
+.llm-response-recorder select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+}
+
+.llm-response-recorder .save-btn {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.llm-response-recorder .save-btn:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+}
+
+.llm-response-recorder .response-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.llm-response-recorder .response-item {
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+.llm-response-recorder .response-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.llm-response-recorder .response-content {
+  white-space: pre-line;
+}
+
+.llm-response-recorder .delete-btn {
+  background: #f44336;
+  color: white;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+}
+
+.llm-response-recorder .no-data {
+  text-align: center;
+  color: #666;
+  padding: 2rem 0;
+}
