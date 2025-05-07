@@ -157,7 +157,7 @@ const divination = (question = '', data) => {
 // 存儲到 localStorage
 const saveToLocalStorage = (divinationResult) => {
   // 獲取已有的歷史記錄
-  const historyKey = 'plumBlossom_history';
+  const historyKey = 'plumBlossomHistory';
   const existingHistory = JSON.parse(localStorage.getItem(historyKey) || '[]');
   
   // 添加新的記錄
@@ -172,16 +172,28 @@ const saveToLocalStorage = (divinationResult) => {
 
 // 從 localStorage 獲取歷史記錄
 const getHistoryFromLocalStorage = () => {
-  const historyKey = 'plumBlossom_history';
-  const rawHistory = JSON.parse(localStorage.getItem(historyKey) || '[]');
-  
-  // 過濾不完整或無效的歷史記錄
-  return rawHistory.filter(item => 
-    item && 
-    item.question && 
-    item.mainHexagram && 
-    item.mainHexagram.name
-  );
+  try {
+    const historyJson = localStorage.getItem('plumBlossomHistory');
+    
+    // 若沒有歷史記錄或解析錯誤，返回空陣列
+    if (!historyJson) {
+      return [];
+    }
+    
+    const history = JSON.parse(historyJson);
+    
+    // 確保解析後的結果是陣列
+    if (!Array.isArray(history)) {
+      console.warn('歷史記錄格式不正確，重置為空陣列');
+      localStorage.setItem('plumBlossomHistory', JSON.stringify([]));
+      return [];
+    }
+    
+    return history;
+  } catch (error) {
+    console.error('讀取歷史記錄時發生錯誤:', error);
+    return [];
+  }
 };
 
 // 增強卦象資訊，添加上掛下掛詳細資料
