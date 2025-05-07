@@ -111,26 +111,15 @@ const HexagramDisplay = ({ hexagram, title, changingLines = [] }) => {
 };
 
 // 歷史記錄組件
-const DivinationHistory = ({ history, onSelectHistory }) => {
+const DivinationHistory = ({ history, onSelectHistory, onDeleteHistory }) => {
   if (!history || history.length === 0) {
     return <div>暫無歷史記錄</div>;
   }
 
-  // 新增刪除歷史記錄的函數
+  // 修改刪除歷史記錄的函數，改為呼叫父組件的方法
   const handleDelete = (index, event) => {
     event.stopPropagation(); // 防止事件冒泡到 li 上觸發選擇功能
-    
-    // 從 localStorage 中取得歷史記錄
-    let savedHistory = getHistoryFromLocalStorage();
-    
-    // 刪除指定索引的記錄
-    savedHistory.splice(index, 1);
-    
-    // 更新 localStorage
-    localStorage.setItem('plumBlossomHistory', JSON.stringify(savedHistory));
-    
-    // 重新載入歷史記錄
-    window.location.reload();
+    onDeleteHistory(index);
   };
 
   return (
@@ -256,6 +245,32 @@ const PlumBlossomDivination = () => {
     }
   };
 
+  // 新增刪除歷史記錄的處理函式
+  const handleDeleteHistory = (index) => {
+    try {
+      // 從 localStorage 中取得最新歷史記錄
+      let savedHistory = getHistoryFromLocalStorage();
+      
+      // 刪除指定索引的記錄
+      savedHistory.splice(index, 1);
+      
+      // 更新 localStorage
+      localStorage.setItem('plumBlossomHistory', JSON.stringify(savedHistory));
+      
+      // 更新狀態（不使用重新載入頁面的方式）
+      setHistory(savedHistory);
+      
+      // 如果目前顯示的結果是被刪除的記錄，則清除顯示
+      if (result && result === history[index]) {
+        setResult(null);
+        setQuestion('');
+      }
+    } catch (err) {
+      console.error('刪除歷史記錄時發生錯誤:', err);
+      setError('刪除歷史記錄時發生錯誤。');
+    }
+  };
+
   return (
     <div className="plum-blossom-divination">
       <h2>梅花易數排盤</h2>
@@ -320,6 +335,7 @@ const PlumBlossomDivination = () => {
         <DivinationHistory 
           history={history}
           onSelectHistory={handleSelectHistory}
+          onDeleteHistory={handleDeleteHistory}
         />
       </div>
     </div>
