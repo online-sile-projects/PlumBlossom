@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import LLMResponseRecorder from './LLMResponseRecorder';
+import { generateDivinationPrompt } from '../utils/llm/promptGenerator';
 
 const LLMDivinationAnalysis = ({ divinationResult }) => {
   const [showPrompt, setShowPrompt] = useState(true);
   const [copied, setCopied] = useState(false);
   
-  // 使用內部函式生成提示詞
+  // 使用匯入的函式生成提示詞
   const prompt = generateDivinationPrompt(divinationResult);
   
   // 複製提示詞到剪貼板
