@@ -116,6 +116,23 @@ const DivinationHistory = ({ history, onSelectHistory }) => {
     return <div>暫無歷史記錄</div>;
   }
 
+  // 新增刪除歷史記錄的函數
+  const handleDelete = (index, event) => {
+    event.stopPropagation(); // 防止事件冒泡到 li 上觸發選擇功能
+    
+    // 從 localStorage 中取得歷史記錄
+    let savedHistory = getHistoryFromLocalStorage();
+    
+    // 刪除指定索引的記錄
+    savedHistory.splice(index, 1);
+    
+    // 更新 localStorage
+    localStorage.setItem('plumBlossomHistory', JSON.stringify(savedHistory));
+    
+    // 重新載入歷史記錄
+    window.location.reload();
+  };
+
   return (
     <div className="divination-history">
       <h3>歷史記錄</h3>
@@ -127,6 +144,13 @@ const DivinationHistory = ({ history, onSelectHistory }) => {
               <> - {item.mainHexagram.name} ({new Date(item.timestamp).toLocaleString()})</> : 
               <> ({new Date(item.timestamp).toLocaleString()})</>
             }
+            <button 
+              className="delete-history-btn" 
+              onClick={(e) => handleDelete(index, e)}
+              style={{ marginLeft: '10px', color: 'red' }}
+            >
+              刪除
+            </button>
           </li>
         ))}
       </ul>
