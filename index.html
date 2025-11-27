@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>梅花易數 AI 占卜</title>
+    <meta name="description" content="結合傳統梅花易數與現代 AI 的智能占卜系統">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'ink': '#2C3E50',
+                        'vermilion': '#C0392B',
+                        'jade': '#16A085',
+                        'paper': '#F5F1E8',
+                        'paper-dark': '#E8E4D9'
+                    },
+                    fontFamily: {
+                        'serif': ['"Noto Serif TC"', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.6.12/lunar.min.js"></script>
+    <!-- Marked for Markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+
+<body class="bg-paper text-ink font-serif min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="py-6 px-4 border-b border-ink/10 bg-paper/80 backdrop-blur-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto">
+            <div class="flex items-center gap-3 justify-center">
+                <div
+                    class="w-10 h-10 bg-ink text-paper flex items-center justify-center rounded-full text-xl font-bold border-2 border-vermilion">
+                    梅</div>
+                <h1 class="text-2xl font-bold tracking-widest">梅花易數 AI</h1>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8 max-w-4xl">
+
+        <!-- Input Section -->
+        <section id="inputSection" class="mb-12 transition-all duration-500">
+            <div class="bg-white/50 p-1 rounded-lg inline-flex mb-6 shadow-sm border border-ink/10">
+                <button id="tabTime"
+                    class="px-6 py-2 rounded-md text-sm font-semibold transition-all bg-ink text-paper shadow-md">時間起卦</button>
+                <button id="tabText"
+                    class="px-6 py-2 rounded-md text-sm font-semibold transition-all hover:bg-black/5 text-ink/70">測字起卦</button>
+            </div>
+
+            <div
+                class="bg-white/60 p-8 rounded-2xl shadow-lg border border-ink/5 backdrop-blur-sm relative overflow-hidden">
+                <!-- Decorative background element -->
+                <div class="absolute top-0 right-0 opacity-5 pointer-events-none">
+                    <svg width="200" height="200" viewBox="0 0 100 100">
+                        <path d="M50 0 L100 50 L50 100 L0 50 Z" fill="currentColor" />
+                    </svg>
+                </div>
+
+                <!-- Time Input Mode -->
+                <div id="modeTime" class="space-y-6">
+                    <div class="text-center mb-8">
+                        <p class="text-lg mb-2">當前農曆時間</p>
+                        <p id="currentLunarTime" class="text-2xl font-bold text-vermilion tracking-wider">載入中...</p>
+                    </div>
+                    <div class="mb-6">
+                        <label for="questionInput" class="block text-sm mb-2 text-ink/70">請輸入您的問題 (選填)</label>
+                        <textarea id="questionInput" rows="3" placeholder="例如：近期事業運勢如何？"
+                            class="w-full px-4 py-3 border border-ink/20 bg-white/50 rounded-lg focus:border-vermilion focus:outline-none transition-colors placeholder-ink/30 resize-none"></textarea>
+                    </div>
+                    <div class="flex justify-center">
+                        <button id="startDivinationBtn"
+                            class="group relative px-8 py-3 bg-ink text-paper text-lg rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all">
+                            <span class="relative z-10 flex items-center gap-2">
+                                立即起卦
+                                <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
+                            </span>
+                            <div
+                                class="absolute inset-0 bg-vermilion transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300">
+                            </div>
+                        </button>
+                    </div>
+                    <p class="text-center text-sm text-ink/50 mt-4">心誠則靈,請在心中默念所測之事</p>
+                </div>
+
+                <!-- Text Input Mode (Hidden by default) -->
+                <div id="modeText" class="hidden space-y-6">
+                    <div class="text-center mb-4">
+                        <label for="textInput" class="block text-lg mb-2">請輸入測字內容</label>
+                        <p class="text-sm text-ink/60 mb-4">輸入 1-5 個漢字,以直覺為準</p>
+                    </div>
+                    <div class="flex flex-col items-center gap-4">
+                        <input type="text" id="textInput" maxlength="10" placeholder="例如：誠、如意、步步高升"
+                            class="w-full max-w-md px-4 py-3 text-center text-xl border-b-2 border-ink/20 bg-transparent focus:border-vermilion focus:outline-none transition-colors placeholder-ink/20">
+                    </div>
+                    <div class="mb-6">
+                        <label for="questionInputText" class="block text-sm mb-2 text-ink/70">請輸入您的問題 (選填)</label>
+                        <textarea id="questionInputText" rows="3" placeholder="例如：近期事業運勢如何？"
+                            class="w-full px-4 py-3 border border-ink/20 bg-white/50 rounded-lg focus:border-vermilion focus:outline-none transition-colors placeholder-ink/30 resize-none"></textarea>
+                    </div>
+                    <div class="flex justify-center">
+                        <button id="startTextDivinationBtn"
+                            class="px-8 py-3 bg-ink text-paper text-lg rounded-lg shadow-lg hover:bg-vermilion transition-colors">
+                            開始測字
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Result Section (Hidden initially) -->
+        <section id="resultSection" class="hidden space-y-8 animate-fade-in">
+
+            <!-- Hexagram Visuals -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Original Hexagram -->
+                <div class="hexagram-card bg-white/60 p-6 rounded-xl border border-ink/5 shadow-md text-center">
+                    <h3 class="text-sm text-ink/60 mb-2 tracking-widest">本卦 (現狀)</h3>
+                    <div id="originalHexagramName" class="text-2xl font-bold mb-4 text-vermilion"></div>
+                    <div id="originalHexagramVisual"
+                        class="hexagram-container h-48 flex flex-col justify-center items-center gap-1.5 my-4"></div>
+                    <p id="originalHexagramText" class="text-sm text-ink/80 italic font-light"></p>
+                </div>
+
+                <!-- Mutual Hexagram -->
+                <div
+                    class="hexagram-card bg-white/40 p-6 rounded-xl border border-ink/5 shadow-sm text-center opacity-80">
+                    <h3 class="text-sm text-ink/60 mb-2 tracking-widest">互卦 (過程)</h3>
+                    <div id="mutualHexagramName" class="text-xl font-bold mb-4"></div>
+                    <div id="mutualHexagramVisual"
+                        class="hexagram-container h-48 flex flex-col justify-center items-center gap-1.5 my-4"></div>
+                    <p id="mutualHexagramText" class="text-xs text-ink/70 italic font-light"></p>
+                </div>
+
+                <!-- Changed Hexagram -->
+                <div class="hexagram-card bg-white/60 p-6 rounded-xl border border-ink/5 shadow-md text-center">
+                    <h3 class="text-sm text-ink/60 mb-2 tracking-widest">變卦 (結果)</h3>
+                    <div id="changedHexagramName" class="text-2xl font-bold mb-4 text-jade"></div>
+                    <div id="changedHexagramVisual"
+                        class="hexagram-container h-48 flex flex-col justify-center items-center gap-1.5 my-4"></div>
+                    <p id="changedHexagramText" class="text-sm text-ink/80 italic font-light"></p>
+                </div>
+            </div>
+
+            <!-- Analysis Info -->
+            <div
+                class="bg-paper-dark/30 p-4 rounded-lg flex flex-wrap justify-center gap-6 text-sm border border-ink/5">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-vermilion"></span>
+                    <span id="tiYongInfo">體用關係計算中...</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-ink"></span>
+                    <span id="movingLineInfo">動爻計算中...</span>
+                </div>
+            </div>
+
+            <!-- AI Prompt Copy Section -->
+            <div class="bg-white/80 p-8 rounded-2xl shadow-lg border border-ink/10 relative">
+                <div
+                    class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-vermilion via-ink to-jade opacity-50">
+                </div>
+                <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-vermilion" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12z" />
+                    </svg>
+                    AI 解卦提示詞
+                </h2>
+                <p class="text-sm text-ink/60 mb-4">複製下方提示詞到您偏好的 AI 服務進行解讀:</p>
+
+                <div class="bg-paper-dark/30 p-4 rounded-lg border border-ink/10 mb-4 relative">
+                    <button id="copyPromptBtn"
+                        class="absolute top-2 right-2 px-3 py-1 bg-ink text-paper text-xs rounded hover:bg-vermilion transition-colors flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        複製
+                    </button>
+                    <pre id="aiPrompt"
+                        class="text-xs font-mono whitespace-pre-wrap overflow-auto max-h-96 pr-16 text-ink/80">生成中...</pre>
+                </div>
+
+                <div class="flex flex-wrap gap-3 justify-center">
+                    <a href="https://gemini.google.com/" target="_blank"
+                        class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow hover:shadow-lg transition-all text-sm font-semibold flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                        </svg>
+                        Google Gemini
+                    </a>
+                    <a href="https://chatgpt.com/" target="_blank"
+                        class="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg shadow hover:shadow-lg transition-all text-sm font-semibold flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z" />
+                        </svg>
+                        ChatGPT
+                    </a>
+                    <a href="https://chat.deepseek.com/" target="_blank"
+                        class="px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-lg shadow hover:shadow-lg transition-all text-sm font-semibold flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                        </svg>
+                        DeepSeek
+                    </a>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button onclick="location.reload()"
+                    class="text-sm text-ink/50 hover:text-vermilion underline decoration-1 underline-offset-4 transition-colors">
+                    重新起卦
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-6 text-center text-xs text-ink/30">
+        <p>&copy; 2024 梅花易數 AI. All rights reserved.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/hexagram-engine.js"></script>
+    <script src="js/stroke-calculator.js"></script>
+    <script src="js/ai-interpreter.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
